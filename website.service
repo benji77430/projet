@@ -1,0 +1,12 @@
+[Unit]
+Description=Flask SmartComposter manager
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/home/pi/projet
+ExecStart=/usr/bin/python3 /home/pi/projet/main.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
