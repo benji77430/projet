@@ -1,6 +1,7 @@
 import os,datetime,threading,time
 from flask import Flask,render_template
-
+from netifaces import AF_INET, AF_INET6, AF_LINK, AF_PACKET, AF_BRIDGE
+import netifaces as ni
 DEBUG=False
 message=""
 app=Flask("website")
@@ -36,8 +37,8 @@ def radio():
         time.sleep(0.01)  # small delay
 @app.route("/")
 def main():
-    
-    return render_template("index.html")
+    ip =ni.ifaddresses('wlan0')[AF_INET][0]['addr']
+    return render_template("index.html",ip=ip)
 
 @app.route('/get-live-data')
 def get_live_data():
