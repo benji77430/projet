@@ -2,6 +2,8 @@ import os,datetime,threading,time
 from flask import Flask,render_template
 from netifaces import AF_INET, AF_INET6, AF_LINK, AF_PACKET, AF_BRIDGE
 import netifaces as ni
+print("starting hotspot : SmartComposter")
+os.system('sudo nmcli device wifi hotspot ssid SmartComposter')
 DEBUG=False
 temp=""
 app=Flask("website")
@@ -53,7 +55,7 @@ def get_live_data():
     m=heure.minute
     s=heure.second
     return f"""
-<p>Température : {temp}<br><br>
+<p>Température : {temp}°C<br><br>
 Time : {h} : {m} : {s}
 </p>
     """
