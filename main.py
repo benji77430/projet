@@ -39,6 +39,7 @@ def radio():
             try:
                 temp=payload.split(",")[0]
                 humidite=payload.split(",")[1]
+                open(f"/home/benji/projet/data.txt",'a').write(f"{temp}:{humidite}:{datetime.datetime.now()}")
             except Exception as e:
                 print(f"an error as occured : {e}")
         time.sleep(0.01)  # small delay
