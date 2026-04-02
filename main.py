@@ -1,7 +1,21 @@
-import os,datetime,threading,time
-from flask import Flask,render_template
-from netifaces import AF_INET, AF_INET6, AF_LINK, AF_PACKET, AF_BRIDGE
-import netifaces as ni
+while True:
+    try:
+        import os,datetime,threading,random,time
+        from flask import Flask,render_template
+        from netifaces import AF_INET, AF_INET6, AF_LINK, AF_PACKET, AF_BRIDGE
+        import netifaces as ni
+        break
+    except ImportError:
+        print("installing dependencies...")
+        import subprocess
+        result=subprocess.run(["/usr/bin/pip","install","--break-system-packages","-r",'requirements.txt'],check=True)
+        if not result:
+            print("an error as occured during installation of dependencies!")
+            pass
+        else:
+            print("operation 1 completed successfully!")
+            continue
+
 print("starting hotspot : SmartComposter")
 os.system('sudo nmcli device wifi hotspot ssid SmartComposter')
 DEBUG=False
