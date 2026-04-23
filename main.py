@@ -47,7 +47,7 @@ def log_data():
             print(f"An error occurred: {e}")
         finally:
             conn.close()
-            time.sleep()
+            time.sleep(10800)
 @app.route("/")
 def main():
     global battery
