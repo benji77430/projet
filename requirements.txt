@@ -1,0 +1,6 @@
+flask
+netifaces
+sqlite
+board
+digitalio
+pyrf24
