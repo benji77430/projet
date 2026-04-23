@@ -1,0 +1,157 @@
+<html>
+    <head>
+        <!DOCTYPE html>
+        <title>
+            Smart Composter Manager
+        </title>
+        <meta charset="utf-8">
+        <!-- <meta http-equiv="refresh" content="1"> -->
+        <link rel="stylesheet" href="/static/styles.css">
+        <link rel="icon" type="image/png" href="/static/logo.jpg">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="/static/htmx.min.js"></script>
+        <script src="/static/p5.min.js"></script>
+        <script src="/static/export.js"></script>
+        <script src="/static/chart.js"></script>
+    </head>
+    <body>
+        <div id="logo">
+            <h1 ><img src="/static/logo.jpg" size="0.05">  SmartComposter</h1>
+        </div>
+        <div id="back">
+            <div class="top-part">
+                <br>
+                <div id="display">
+                    <div id="gauge-cluster">
+                        <div class="gauges" id="gauge-temp" style="display: block; align-items: center; justify-content: center;">
+                            <br><label id="temp">Température</label>
+                        </div>
+                        <br>
+                        <div class="gauges" id="gauge-humidite" style="display: block; align-items: center; justify-content: center;">
+                            <br><label id="humidite">Humidité
+                            </label>
+                        </div>
+
+                    </div>
+                    <div class="infos">
+                        <a href="/static/etapes-compostage.png"><img src="/static/etapes-compostage.png" size=0.95></a>
+                    </div>
+                    <div id="right-div">
+                        <div class="top-right">
+                            <div id="battery-level">
+                                <h5>
+                                    Niveau de Batterie : {{battery}}%
+                                </h5>
+                                {% if battery < 25%}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" fill="currentColor" class="bi bi-battery" viewBox="0 0 16 16">
+                                <path d="M0 6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1zm14 3a1.5 1.5 0 0 1-1.5 1.5v-3A1.5 1.5 0 0 1 16 8"/>
+                                </svg>
+                                {% elif battery >= 25 and battery < 50 %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" fill="currentColor" class="bi bi-battery-low" viewBox="0 0 16 16">
+                                <path d="M2 6h2v4H2z"/>
+                                <path d="M2 4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm10 1a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm4 3a1.5 1.5 0 0 1-1.5 1.5v-3A1.5 1.5 0 0 1 16 8"/>
+                                </svg>
+                                {% elif battery >= 50 and battery < 75 %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" fill="currentColor" class="bi bi-battery-half" viewBox="0 0 16 16">
+                                <path d="M2 6h5v4H2z"/>
+                                <path d="M2 4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm10 1a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm4 3a1.5 1.5 0 0 1-1.5 1.5v-3A1.5 1.5 0 0 1 16 8"/>
+                                </svg>
+                                {% elif battery >= 75 and battery <= 100 %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" fill="currentColor" class="bi bi-battery-full" viewBox="0 0 16 16">
+                                <path d="M2 6h10v4H2z"/>
+                                <path d="M2 4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm10 1a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm4 3a1.5 1.5 0 0 1-1.5 1.5v-3A1.5 1.5 0 0 1 16 8"/>
+                                </svg>
+                                {% endif %}
+                            </div>
+                            <div class="export">
+                                <form method="GET">
+                                    <h5>exporter les mesures de : </h5><input type="date" id="date1"/>
+                                    <h5>à : </h5><input type="date" id="date2"/>
+                                    <br><br>
+                                    <input type="submit" value="exporter" id="submit">
+                                </form>
+                            </div>
+                        </div>
+                        <br><br>
+                        
+                        <div class="logs" id="logs-div">
+                        {% if logs -%}
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <td class="logs-td">Date</td>
+                                        <td class="logs-td">Température</td>
+                                        <td class="logs-td">Humidité</td>
+                                    </tr>
+                                </thead>
+                                {% for log in logs %}
+                                <tr>
+                                    <td class="logs-td">{{log[1]}}</td>
+                                    <td class="logs-td">{{log[2]}}°C</td>
+                                    <td class="logs-td">{{log[3]}}%</td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="bottom-part">
+                <div id="first-chart" style="width: 95%; margin: auto;">
+                    <canvas id="curve-temp"></canvas>
+                </div>
+                <div id="second-chart" style="width: 95%; margin: auto;">
+                    <canvas id="curve-humidite"></canvas>
+                </div>
+            </div>
+            <a id="ip" href="ssh://{{ip}}">SSH: {{ip}}</a>
+        </div>
+        
+    </body>
+ <script>
+        const ctx_temp = document.getElementById('curve-temp').getContext('2d');
+        const curve_temp = new Chart(ctx_temp, {
+            type: 'line', 
+            data: {
+                labels: {{ dates|safe }},
+                datasets: [{
+                    label: 'Température',
+                    data: {{ temps|safe }},
+                    fill: false,
+                    borderColor: '#126795',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: false }
+                }
+            }
+        });
+        const ctx_humidite = document.getElementById('curve-humidite').getContext('2d');
+        const curve_humidite = new Chart(ctx_humidite, {
+            type: 'line', 
+            data: {
+                labels: {{ dates|safe }},
+                datasets: [{
+                    label: 'Humidité',
+                    data: {{ humidites|safe }},
+                    fill: false,
+                    borderColor: '#126795',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: false }
+                }
+            }
+        });
+    </script>
+<script src="static/humidite.js"></script>
+
+</html>
