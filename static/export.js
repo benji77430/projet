@@ -19,5 +19,12 @@ document.addEventListener("DOMContentLoaded", function() {
         console.log(formattedDate2);
         window.location.href = window.location.origin +`/logs?date1=${formattedDate1}&date2=${formattedDate2}`;
     });
-
+    document.getElementById("poweroff").addEventListener("click", function(event) {
+        event.preventDefault();
+        window.location.href = window.location.origin +`/poweroff`;
+    });
+    document.getElementById("reboot").addEventListener("click", function(event) {
+        event.preventDefault();
+        window.location.href = window.location.origin +`/reboot`;
+    });
 });

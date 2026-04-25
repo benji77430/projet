@@ -1,5 +1,5 @@
 import os,datetime,threading,random,time,sqlite3
-from flask import Flask,render_template
+from flask import Flask,render_template,request
 from netifaces import AF_INET, AF_INET6, AF_LINK, AF_PACKET, AF_BRIDGE
 import netifaces as ni
 #DEBUG MODE
@@ -43,7 +43,7 @@ def log_data():
             print(f"An error occurred: {e}")
         finally:
             conn.close()
-            time.sleep()
+            time.sleep(10800)
 @app.route("/")
 def main():
     global battery
@@ -88,7 +88,6 @@ def main():
 
 def radio():
     import time
-    from pyrf24 import RF24, RF24_PA_HIGH,RF24_250KBPS
     global temp,humidite,battery
     temp=float(random.randint(-100,1400))/10
     humidite=float(random.randint(0,1000,))/10
@@ -155,6 +154,14 @@ def get_temp():
 def get_humidite():
     global humidite
     return f"{humidite}"
+@app.route("/poweroff")
+def poweroff():
+    os.system("sudo poweroff")
+    main()
+@app.route("/reboot")
+def reboot():
+    os.system("sudo reboot")
+    main()
 threading.Thread(target=log_data).start()
 threading.Thread(target=radio).start()
 app.run(host='0.0.0.0', port=80,debug=DEBUG)
