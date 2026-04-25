@@ -1,5 +1,5 @@
-import os,datetime,threading,random,time,sqlite3
-from flask import Flask,render_template,request
+import os,datetime,threading,random,time,sqlite3,csv
+from flask import Flask,render_template,request,send_file
 from netifaces import AF_INET, AF_INET6, AF_LINK, AF_PACKET, AF_BRIDGE
 import netifaces as ni
 #DEBUG MODE
@@ -45,7 +45,7 @@ def log_data():
             conn.close()
             time.sleep(10800)
 @app.route("/")
-def main():
+def main(error=None):
     global battery
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
@@ -83,8 +83,10 @@ def main():
     except sqlite3.Error as e:
         print(f"An error occurred: {e}")
     ip=ni.ifaddresses('wlan0')[AF_INET][0]['addr']
-    
-    return render_template("index.html",ip=ip,logs=results,battery=int(battery),dates=dates,temps=temps,humidites=humidites)
+    if error==None:
+        return render_template("index.html",ip=ip,logs=results,battery=int(battery),dates=dates,temps=temps,humidites=humidites)
+    else:
+        return render_template("index.html",ip=ip,logs=results,battery=int(battery),dates=dates,temps=temps,humidites=humidites,error=error)
 
 def radio():
     import time
@@ -125,6 +127,8 @@ def getlogfile():
 
         if not results:
             print(f"No records found for the range {date1} to {date2}.")
+            main(error=f"aucune mesures trouvé pour la date {date1} à {date2}.")
+
         else:
             print(f"Success! Found {len(results)} records.")
             

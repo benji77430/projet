@@ -1,5 +1,5 @@
-import os,datetime,threading,random,time,sqlite3
-from flask import Flask,render_template
+import os,datetime,threading,random,time,sqlite3,csv
+from flask import Flask,render_template,request,send_file
 from netifaces import AF_INET, AF_INET6, AF_LINK, AF_PACKET, AF_BRIDGE
 import netifaces as ni
 import board
@@ -49,7 +49,7 @@ def log_data():
             conn.close()
             time.sleep(10800)
 @app.route("/")
-def main():
+def main(error=None):
     global battery
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
@@ -81,14 +81,16 @@ def main():
         cursor.execute(sql_query, (50,))
         
         values = cursor.fetchall()
-        dates= [i[1] for i in values]
+        dates= [i[1].split(" ")[0] for i in values]
         temps= [i[2] for i in values]
         humidites= [i[3] for i in values]
     except sqlite3.Error as e:
         print(f"An error occurred: {e}")
     ip=ni.ifaddresses('wlan0')[AF_INET][0]['addr']
-    
-    return render_template("index.html",ip=ip,logs=results,battery=int(battery),dates=dates,temps=temps,humidites=humidites)
+    if error==None:
+        return render_template("index.html",ip=ip,logs=results,battery=int(battery),dates=dates,temps=temps,humidites=humidites)
+    else:
+        return render_template("index.html",ip=ip,logs=results,battery=int(battery),dates=dates,temps=temps,humidites=humidites,error=error)
 
 def radio():
     import time
@@ -133,7 +135,7 @@ def getlogfile():
     date1 = request.args.get('date1')
     date2 = request.args.get('date2')
     if not date1 or not date2:
-        main()
+        return main()
     def to_iso(date_str):
         d, m, y = date_str.split('-')
         return f"{y}-{m}-{d}"
@@ -161,6 +163,8 @@ def getlogfile():
 
         if not results:
             print(f"No records found for the range {date1} to {date2}.")
+            return main(error=f"aucune mesures trouvé pour la date {date1} à {date2}.")
+
         else:
             print(f"Success! Found {len(results)} records.")
             
@@ -190,6 +194,14 @@ def get_temp():
 def get_humidite():
     global humidite
     return f"{humidite}"
+@app.route("/poweroff")
+def poweroff():
+    os.system("sudo poweroff")
+    main()
+@app.route("/reboot")
+def reboot():
+    os.system("sudo reboot")
+    main()
 threading.Thread(target=log_data).start()
 threading.Thread(target=radio).start()
 app.run(host='0.0.0.0', port=80,debug=DEBUG)
