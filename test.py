@@ -89,11 +89,12 @@ def main(error=None):
         return render_template("index.html",ip=ip,logs=results,battery=int(battery),dates=dates,temps=temps,humidites=humidites,error=error)
 
 def radio():
-    import time
     global temp,humidite,battery
-    temp=float(random.randint(-100,1400))/10
-    humidite=float(random.randint(0,1000,))/10
-    battery=float(random.randint(0,1000))/10
+    while True:
+        temp=float(random.randint(-100,1400))/10
+        humidite=float(random.randint(0,1000,))/10
+        battery=float(random.randint(0,1000))/10
+        time.sleep(0.5)
 @app.route("/logs", methods=['GET'])
 def getlogfile():
     date1 = request.args.get('date1')

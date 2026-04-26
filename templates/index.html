@@ -23,15 +23,15 @@
                 <br>
                 <div id="display">
                     <div id="gauge-cluster">
-                        <div class="gauges" id="gauge-temp" style="display: block; align-items: center; justify-content: center;">
-                            <br><label id="temp">Température</label>
+                        <div class="gauges">
+                            <div class="gauges-title" id="temp"></div>
+                            <div class="canvas-container" id="gauge-temp" style="display: block; align-items: center; justify-content: center;"></div>
                         </div>
-                        <br>
-                        <div class="gauges" id="gauge-humidite" style="display: block; align-items: center; justify-content: center;">
-                            <br><label id="humidite">Humidité
-                            </label>
+                        <div class="gauges">
+                        
+                            <div class="gauges-title" id="humidite"></div>
+                            <div class="canvas-container" id="gauge-humidite" style="display: block; align-items: center; justify-content: center;"></div>
                         </div>
-
                     </div>
                     <div class="infos">
                         {% if error -%}
@@ -70,7 +70,6 @@
                                 <form method="GET">
                                     <h5>exporter les mesures de : </h5><input type="date" id="date1"/>
                                     <h5>à : </h5><input type="date" id="date2"/>
-                                    <br><br>
                                     <input type="submit" value="exporter" id="submit">
                                 </form>
                             </div>

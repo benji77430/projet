@@ -17,14 +17,15 @@ body {
     display: flex;
     margin-left: 42%;
     margin-right: 42%;
+    margin: 0 auto;
     justify-content: center;
     align-items: center;
     text-align: center;
     justify-items: center;
     height: 5%;
-    width: 330px;
-    border-radius: 3px;
-    padding: 0%;
+    width: fit-content;
+    border-radius: 1%;
+    padding-inline: 1%;
     background-color: rgba(0, 0, 0, 0.312);
     -webkit-box-shadow: 0px 4px 7px -3px rgba(0,0,0,0.4);
     box-shadow: 0px 4px 7px -3px rgba(0,0,0,0.4);
@@ -39,10 +40,13 @@ body {
 
 }
 #gauge-cluster {
-    display: block;
-    justify-content: center;
-    justify-items: center;
-    align-items: center;
+    display: flex;
+    flex:1;
+    min-width: 150px;
+    flex-direction: column; /* Stacks them vertically */
+    align-items: left;    /* Keeps them centered and the same width */
+    gap: 20px;              /* Adds space between the two cards */
+    width: 100%;
 }
 label {
     display: flex;
@@ -51,16 +55,31 @@ label {
     align-items: center;
 }
 .gauges {
-    margin-left: 5%;
-    width:300px;
-    height: 330px;
-    border-width: 4%;
-    border-radius: 3%;
-    border-color: black;
-    -webkit-box-shadow: 0px 4px 7px -3px rgba(0,0,0,0.4);
-    box-shadow: 0px 4px 7px -3px rgba(0,0,0,0.4);
+    width: 100%;             /* Width relative to the screen */
+    max-width: 350px;       /* Hard limit so they don't get huge */
     background-color: #ffffff;
+    border-radius: 15px;
+    padding: 20px;
+    box-sizing: border-box; /* IMPORTANT: ensures padding doesn't add to width */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0px 10px 20px rgba(0,0,0,0.1);
+}
 
+.gauges-title {
+    text-align: center;
+    font-family: 'Segoe UI', sans-serif;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.canvas-container {
+    width: 100%;          /* Canvas container fills the card width */
+    aspect-ratio: 1 / 1;  /* This ensures the gauge area is a perfect square */
+    display: flex;
+    justify-content: center;
 }
 #ip, a{
     align-items: center;
@@ -82,7 +101,7 @@ h1 {
 }
 #logo img {
     align-self: center;
-    height: 35px;
+    height: 2rem;
     padding-top: 2%;
     padding-right: 2%;
 }
@@ -94,29 +113,40 @@ h1 {
     padding: 1%;
     border-radius: 0.7%;
     height: max-content;
+    width: 97%;
 }
 .infos {
-    display: block;
-    justify-content: left;
+    display: flex;
+    flex: 2;
+    justify-content: center;
     justify-items: left;
     align-items: left;
-    margin-left: 5%;
+    padding-top: 2%;
+    margin-left: 1%;
+    margin-right: 3%;
 }
 .infos img {
-    width: 80%;
-    height: max-content;
-    -webkit-box-shadow: 0px 4px 7px -3px rgba(0,0,0,0.4);
-    box-shadow: 0px 4px 7px -3px rgba(0,0,0,0.4);
+    width: 100%;       /* Fill the flex container */
+    max-width: 900px;  /* Prevent it from becoming giant on huge screens */
+    height: auto;      /* Maintain aspect ratio */
+    border-radius: 8px;
+    box-shadow: 0px 4px 15px rgba(0,0,0,0.1);
+    
 
 }
 #display {
-    text-align: center;
-    align-items: center ;
     display: flex;
+    justify-content: space-between; /* Spreads elements out */
+    align-items: flex-start;       /* Aligns them to the top */
+    gap: 20px;                      /* Adds breathing room between sections */
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
 }
 table {
     border-collapse: collapse;
     border-spacing: 0;
+    width: 100%;
 }
 .logs-td {
     padding-left: 2%;
@@ -125,8 +155,11 @@ table {
     width: 170px;
     height: 45px;
     text-align: center;
-    border-bottom: 1px solid black;
+    border-bottom: 2px solid black;
     white-space: nowrap;
+    padding: 10px 5px; /* Add space inside cells */
+    text-align: center;
+    border-bottom: 1px solid #eee;
 }
 #logs-div {
     border-radius: 9px;
@@ -137,13 +170,26 @@ table {
 #right-div {
     display: inline;
     align-items: center;
+    max-width: 500px;
     border-radius: 9px;
     -webkit-box-shadow: 0px 4px 7px -3px rgba(0,0,0,0.4);
     box-shadow: 0px 4px 7px -3px rgba(0,0,0,0.4);
+    flex: 1.5; /* Gives the table and battery enough room */
+    min-width: 350px;
+    background-color: white; /* Make sure it has a background if needed */
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    padding: 20px; /* This keeps the table away from the edge */
+    box-sizing: border-box;
+    justify-content: center;
+    height: max-content;
 
 }
 #battery-level {
     align-self: center;
+    text-align: center;
+    align-items: center;
     width: 50%;
 }
 .top-right {
@@ -152,9 +198,17 @@ table {
 }
 .export {
     display: flex;
-    align-items: right;
-    padding-left: 30px;
+    align-items: left;
+    text-align: center;
+    justify-content: center;
+    margin-left: 25px;
+    padding-left: 20px;
     border-left: 2px solid black;
+}
+.export input {
+    align-items: center;
+    border-radius: 5px;
+    border: 0.01rem solid #126795;
 }
 #submit {
     justify-content: center;
@@ -165,7 +219,7 @@ table {
     border: 1px solid black;
     width: 55%;
     border-radius: 5px;
-    margin-top: 0.3em;
+    margin-top: 0.8em;
     padding-top: 0.2em;
     padding-bottom: 0.1em;
     text-shadow: -1px 4px 7px rgba(0, 0, 0, 0.36);
@@ -185,6 +239,7 @@ table {
 .bottom-part {
     border-top: 3px solid #126795;
     margin-top: 3%;
+    width: 100%;
 }
 .system {
     display: flex;
@@ -231,4 +286,8 @@ table {
 #error {
     color: red;
     text-decoration: underline red;
+}
+.logs {
+    width: 100%; /* Make the table fill its container */
+    margin-top: 15%;
 }
