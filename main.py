@@ -8,9 +8,10 @@ print("starting hotspot : SmartComposter")
 os.system('sudo nmcli device wifi hotspot ssid SmartComposter')
 #DEBUG MODE
 DEBUG=False
+PORT=80
 
 #BACKUP DELAY SECONDS
-BACKUP_DELAY=600
+BACKUP_DELAY=10800 #10800 = 3 hours
 
 app=Flask("website")
 temp=0
@@ -22,8 +23,6 @@ def log_data():
     while True:
         conn = sqlite3.connect(DB_NAME)
         cursor = conn.cursor()
-        
-        # Create table if it doesn't exist
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS readings (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -32,8 +31,6 @@ def log_data():
                 humidity REAL NOT NULL
             )
         ''')
-    
-        # Insert the new data
     
         try:
             timestamp=datetime.datetime.now().strftime('%d-%m-%Y %H:%M:%S')
@@ -47,17 +44,12 @@ def log_data():
             print(f"An error occurred: {e}")
         finally:
             conn.close()
-            time.sleep(10800)
+            time.sleep(BACKUP_DELAY)
 @app.route("/")
 def main(error=None):
     global battery
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
-    
-    # THE KEY SQL QUERY EXPLANATION:
-    # 1. ORDER BY id DESC: Sorts the entire table by ID in DESCENDING order. 
-    #    This puts the highest (newest) IDs at the top.
-    # 2. LIMIT N: Restricts the result set to only the top N rows.
     sql_query = f"""
         SELECT * FROM readings
         ORDER BY id DESC
@@ -96,7 +88,6 @@ def radio():
     import time
     from pyrf24 import RF24, RF24_PA_HIGH,RF24_250KBPS
     global temp,humidite,battery
-    # Setup for Raspberry Pi 3B
     # CE pin is 22, CSN pin is 8 (CE0)
     radio = RF24(22, 0) 
 
@@ -104,9 +95,9 @@ def radio():
         if not radio.begin():
             print("Radio hardware not responding!")
             return False
-    
+        #MAX RANGE FOR CHANNEL 115
         radio.set_pa_level(RF24_PA_HIGH)
-        radio.setChannel(115)         # Set to Channel 80 as discussed
+        radio.setChannel(115)
         radio.setDataRate(RF24_250KBPS)
         radio.open_rx_pipe(1, b"00001")
         radio.listen = True
@@ -117,10 +108,7 @@ def radio():
         if setup():
             while True:
                 if radio.available():
-                    # Read the 32-byte payload
                     payload = radio.read(radio.getDynamicPayloadSize())
-                
-                    # Decode and strip the Null bytes (\x00)
                     try:
                         data = payload.decode("utf-8").strip("\x00")
                         print(f"Received: {data}")
@@ -143,15 +131,8 @@ def getlogfile():
     try:
         conn = sqlite3.connect(DB_NAME)
         cursor = conn.cursor()
-
-
-        # Conversion for the SQL placeholders
         start_iso = to_iso(date1)
         end_iso = to_iso(date2)
-
-        # The Logic:
-        # 1. substr(timestamp, 1, 10) grabs just the "DD-MM-YYYY" part.
-        # 2. We rearrange it to YYYY-MM-DD so the 'BETWEEN' comparison actually works.
         sql_query = """
             SELECT * FROM readings 
             WHERE (substr(timestamp, 7, 4) || '-' || substr(timestamp, 4, 2) || '-' || substr(timestamp, 1, 2))
@@ -202,6 +183,13 @@ def poweroff():
 def reboot():
     os.system("sudo reboot")
     main()
+
+if not os.path.exist("/etc/systemd/system/website.service"):
+    os.system("sudo cp website.service /etc/systemd/system")
+    print("website service copied successfully !")
+print("starting logging service !") 
 threading.Thread(target=log_data).start()
+print("starting radio service ! ")
 threading.Thread(target=radio).start()
-app.run(host='0.0.0.0', port=80,debug=DEBUG)
+print("starting website !")
+app.run(host='0.0.0.0', port=PORT,debug=DEBUG)
