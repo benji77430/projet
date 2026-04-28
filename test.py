@@ -77,9 +77,9 @@ def main(error=None):
         cursor.execute(sql_query, (50,))
         
         values = cursor.fetchall()
-        dates= [i[1] for i in values]
-        temps= [i[2] for i in values]
-        humidites= [i[3] for i in values]
+        dates= [i[1].split(" ")[0] for i in values][::-1]
+        temps= [i[2] for i in values][::-1]
+        humidites= [i[3] for i in values][::-1]
     except sqlite3.Error as e:
         print(f"An error occurred: {e}")
     ip=ni.ifaddresses('wlan0')[AF_INET][0]['addr']
