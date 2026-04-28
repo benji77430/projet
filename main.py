@@ -4,8 +4,7 @@ from netifaces import AF_INET, AF_INET6, AF_LINK, AF_PACKET, AF_BRIDGE
 import netifaces as ni
 import board
 import digitalio
-print("starting hotspot : SmartComposter")
-os.system('sudo nmcli device wifi hotspot ssid SmartComposter')
+
 #DEBUG MODE
 DEBUG=False
 PORT=80
@@ -18,6 +17,11 @@ temp=0
 humidite=0
 battery=0
 DB_NAME = 'logs.db'
+
+print("starting hotspot : SmartComposter")
+def hotspot():
+    os.system('sudo nmcli device wifi hotspot ssid SmartComposter')
+
 def log_data():
     global temp,humidite,battery
     while True:
@@ -187,6 +191,8 @@ def reboot():
 if not os.path.exist("/etc/systemd/system/website.service"):
     os.system("sudo cp website.service /etc/systemd/system")
     print("website service copied successfully !")
+print("starting hotspot service !")
+threading.Thread(target=hotspot).start()
 print("starting logging service !") 
 threading.Thread(target=log_data).start()
 print("starting radio service ! ")
