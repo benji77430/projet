@@ -188,7 +188,7 @@ def reboot():
     os.system("sudo reboot")
     main()
 
-if not os.path.exist("/etc/systemd/system/website.service"):
+if not os.path.exists("/etc/systemd/system/website.service"):
     os.system("sudo cp website.service /etc/systemd/system")
     print("website service copied successfully !")
 print("starting hotspot service !")
