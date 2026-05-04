@@ -119,6 +119,8 @@ def radio():
                         
                         if "," in data:
                             temp, humidite,battery = data.split(",")
+                            temp=float(temp)/10
+                            humidite=float(humidite)/10
                             print(f"-> Temp: {temp}C | Humidity: {humidite}% | Battery : {battery}%")
                     except Exception as e:
                         print(f"Decoding error: {e}")
